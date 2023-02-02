@@ -6,8 +6,8 @@ import adventurelib as a
 
 hit_points = 4
 
-#userName = input("Please type your name: ")
-#print(f'Welcome {userName}')
+userName = input("Please type your name: ")
+print(f'Welcome {userName}')
 
 raft = a.Room("""Thank you for playing.
 You wake up on a small raft in the middle of the ocean. You see a small bit of land in the west.""")
