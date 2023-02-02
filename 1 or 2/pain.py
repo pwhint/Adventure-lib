@@ -12,10 +12,10 @@ hit_points = 4
 raft = a.Room("""Thank you for playing.
 You wake up on a small raft in the middle of the ocean. You see a small bit of land in the west.""")
 
-island = a.Room("You are now on a small island with a faint trail/")
+island = a.Room("You are now on a small island with a faint trail")
 
 town1 = a.Room("""You are now in a small village with people bustling on either side of you.
-You realize that this is no island, is a continent.""")
+You realize that this isno island, is a continent.""")
 
 crossRoad = a.Room("""You find a small trail that goes north and south.""")
 
