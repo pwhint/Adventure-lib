@@ -6,54 +6,37 @@ import adventurelib as a
 
 hit_points = 4
 
-userName = input("Please type your name: ")
-print(f'Welcome {userName}')
+#userName = input("Please type your name: ")
+#print(f'Welcome {userName}')
 
-raft = a.Room("""Thank you for playing.
+raft = a.Room("""Thank you for playing. Note, sometimes lowercase is needed. You will want to use lowercase.
 You wake up on a small raft in the middle of the ocean. You see a small bit of land in the west.""")
 
 island = a.Room("You are now on a small island with a faint trail")
 
 town1 = a.Room("""You are now in a small village with people bustling on either side of you.
-You realize that this isno island, is a continent.""")
+You realize that this is no island, is a continent.""")
 
-crossRoad = a.Room("""You find a small trail that goes north and south.""")
+crossRoad = a.Room("""You find a small trail that goes north, east, and south.""")
 
 cliff = a.Room("""As you climb the steep trail you see the ocean to the right of you. At the top,
 you come to the end with a 100 foot cliff.""")
 
 ocean = a.Room("you see a small cave in the side of the cliff")
 
-cave = a.Room(f"""In this small small cave, you hear water dripping. As you step in,
+cave = a.Room("""In this small small cave, you hear water dripping. As you step in,
 You step on a small stalagmite.""")
+
+fail = a.Room("""You find that the raft was not pulled up enough, so it floated away""")
 
 current_room = raft
 #Making items
-chocolate = a.Item("a small bar of chocolate", "chocolate")
-berrys = a.Item("some shriveled berry's", "berry's")
-
-raft.contents = a.Bag()
-raft.contents.add(chocolate)
-
-island.contents = a.Bag()
-island.contents.add(berrys)
-
-cliff.contents = a.Bag()
-
-crossRoad.contents = a.Bag()
-
-town1.contents = a.Bag()
-town1.contents.add(wizard)
-
-ocean.contents = a.Bag()
-
-cave.contents = a.Bag()
-
-inventory = a.Bag()
 
 raft.west = island
-island.north = town1
-island.south = cliff
+island.west = crossRoad
+crossRoad.north = town1
+crossRoad.south = cliff
+island.east = fail
 
 @when("go DIRECTION")
 @when("s", direction = "south")
@@ -78,6 +61,22 @@ def go(direction: str):
         look()
     if hit_points < 1:
         exit()
+
+@when("use ITEM")
+def use(item: str):
+    """Use an item, consumes it if used
+    Arguments:
+        item {str} -- Which item to use
+    """
+
+    # First, do you have the item?
+    obj = inventory.take(item)
+    if not obj:
+        print(f"You don't have {item}")
+
+    # Try to use the item
+    else:
+        obj.use_item(current_room)
 
 @when("look")
 def look():
@@ -127,13 +126,14 @@ def get(item: str):
 
 @when("eat ITEM")
 def eat(item: str):
-    if item:
+    if item == berrys and chocolate:
         global hit_points
         hit_points += 1
         print(f"You ate {item}! You have {hit_points} health!")
+        
 
     else:
-        print(f"You can't eat {item}. Try again later when you have an edible item in you inventory.")
+        print(f"You can't eat the {item}. Try again later when you have an edible item in you inventory.")
     if hit_points < 1:
         exit()
 
@@ -151,6 +151,7 @@ def swim():
     global current_room
     if current_room == ocean:
         current_room = cave
+        look()
     else:
         print("You fall on your face trying to do a glories dive.")
         global hit_points
@@ -158,14 +159,18 @@ def swim():
     if hit_points < 1:
         exit()
 
-@when("talk CHARACTER")
-def talk(character: str):
+@when("talk to CHARACTER")
+def talk_to(character: str):
     if character == 'wizard':
         yes = input("""Do you want to go on a quest?
                     """)
         if yes == 'yes':
-            print("""Okay. In this world there is a magic sword.
-The one catch is, it's guarded by a giant lion.""")
+            print("""Okay. In this world there is a sword.
+The one catch is, it's guarded by a giant lion. If you bring it to me,
+I can enchant it for you.""")
+            global cave
+            cave.contents.add(sword)
+            
         else:
             print("Well then. Come back when you feel like it!")
     else:
@@ -183,6 +188,35 @@ def print_health():
     print(f"you have {hit_points} health!")
     if hit_points < 1:
         exit()
+
+chocolate = a.Item("a small bar of chocolate", "chocolate")
+chocolate.use_item = eat
+berrys = a.Item("some shriveled berry's", "berry's")
+berrys.use_item = eat
+sword = a.Item("A gleaming sword", "sword")
+
+raft.contents = a.Bag()
+raft.contents.add(chocolate)
+
+island.contents = a.Bag()
+island.contents.add(berrys)
+
+cliff.contents = a.Bag()
+
+crossRoad.contents = a.Bag()
+
+town1.contents = a.Bag()
+town1.contents.add(wizard)
+
+ocean.contents = a.Bag()
+
+cave.contents = a.Bag()
+
+fail.contents = a.Bag()
+
+inventory = a.Bag()
+
+
 
 look()
 a.start()
